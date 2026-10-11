@@ -37,3 +37,7 @@ This project is also licensed under GPL-3.0 in compliance.
 Built with
 - [Claude](https://claude.ai) by Anthropic
 - [OpenCode](https://github.com/sst/opencode) by SST
+
+- > **Note:** The contributor graph may show an unrelated GitHub account
+> due to a git configuration issue during development. That account has
+> no involvement in this project whatsoever.
