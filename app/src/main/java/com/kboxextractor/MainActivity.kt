@@ -499,7 +499,7 @@ private suspend fun fetchAndDecode(onStatus: (String) -> Unit): String {
         Log.d(TAG, "After ROT13: ${hexed.length} chars")
         onStatus("Decoding hex...")
         var data = withContext(Dispatchers.IO) { hexDecode(hexed) }
-        Log.d(TAG, "After hex: ${data.size} bytes")
+        Log.d(TAG, "After hex decode: ${data.size} bytes")
         for (pass in 1..10) {
             onStatus("Decoding base64 (pass $pass/10)...")
             data = withContext(Dispatchers.IO) { base64Decode(data, pass) }
@@ -517,7 +517,7 @@ private suspend fun fetchAndDecode(onStatus: (String) -> Unit): String {
         onStatus("Decoding hex...")
         val hexed = withContext(Dispatchers.IO) { String(data, Charsets.UTF_8) }
         val rotBytes = withContext(Dispatchers.IO) { hexDecode(hexed) }
-        Log.d(TAG, "After hex: ${rotBytes.size} bytes")
+        Log.d(TAG, "After hex decode: ${rotBytes.size} bytes")
         onStatus("Decoding ROT13...")
         xml = withContext(Dispatchers.IO) { rot13Decode(String(rotBytes, Charsets.UTF_8)) }
         Log.d(TAG, "After ROT13: ${xml.length} chars")
@@ -525,7 +525,7 @@ private suspend fun fetchAndDecode(onStatus: (String) -> Unit): String {
     onStatus("Validating...")
     if (xml.isBlank()) throw EmptyKeyboxException()
     withContext(Dispatchers.IO) { validateKeybox(xml) }
-    Log.d(TAG, "Final XML: ${xml.length} chars")
+    Log.d(TAG, "Final XML length: ${xml.length} chars")
     onStatus("Done.")
     return xml
 }
