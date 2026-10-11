@@ -33,3 +33,7 @@ Integrity-Box is licensed under GPL-3.0.
 This project is also licensed under GPL-3.0 in compliance.
 
 ## By Lecrex
+
+Built with
+- [Claude](https://claude.ai) by Anthropic
+- [OpenCode](https://github.com/sst/opencode) by SST
