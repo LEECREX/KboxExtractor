@@ -515,8 +515,11 @@ private suspend fun fetchAndDecode(onStatus: (String) -> Unit): String {
     onStatus("Validating...")
     if (xml.isBlank()) throw EmptyKeyboxException()
     withContext(Dispatchers.IO) { validateKeybox(xml) }
+    val fixedXml = xml
+        .replace("-----</Certificate>", "-----\n</Certificate>")
+        .replace("-----</PrivateKey>", "-----\n</PrivateKey>")
     onStatus("Done.")
-    return xml
+    return fixedXml
 }
 
 private fun isHexString(s: String): Boolean {
