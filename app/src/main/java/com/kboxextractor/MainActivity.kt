@@ -12,6 +12,7 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.provider.OpenableColumns
 import android.util.Base64
+import android.util.Log
 import android.util.Xml
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -86,6 +87,8 @@ enum class Screen { WELCOME, READY, LOADING, RESULT, ERROR }
 
 private const val MEGATRON_URL =
     "https://github.com/MeowDump/Integrity-Box/releases/download/archive/Megatron"
+
+private const val TAG = "KboxExtractor"
 
 private class DownloadFailedException : Exception("Download failed — check your connection")
 private class ServerErrorException(val code: Int) : Exception("Server error [$code] — try again later")
@@ -487,16 +490,20 @@ private fun openInBrowser(context: Context, url: String) {
 private suspend fun fetchAndDecode(onStatus: (String) -> Unit): String {
     onStatus("Downloading from GitHub...")
     val raw = withContext(Dispatchers.IO) { downloadMegatron() }
+    Log.d(TAG, "Downloaded: ${raw.toByteArray(Charsets.UTF_8).size} bytes")
     val xml: String
     if (isHexString(raw)) {
         // Legacy layout: ROT13 -> hex -> base64 x10
         onStatus("Decoding ROT13...")
         val hexed = withContext(Dispatchers.IO) { rot13Decode(raw) }
+        Log.d(TAG, "After ROT13: ${hexed.length} chars")
         onStatus("Decoding hex...")
         var data = withContext(Dispatchers.IO) { hexDecode(hexed) }
+        Log.d(TAG, "After hex: ${data.size} bytes")
         for (pass in 1..10) {
             onStatus("Decoding base64 (pass $pass/10)...")
             data = withContext(Dispatchers.IO) { base64Decode(data, pass) }
+            Log.d(TAG, "After base64 pass $pass: ${data.size} bytes")
         }
         xml = withContext(Dispatchers.IO) { String(data, Charsets.UTF_8) }
     } else {
@@ -505,21 +512,22 @@ private suspend fun fetchAndDecode(onStatus: (String) -> Unit): String {
         for (pass in 1..10) {
             onStatus("Decoding base64 (pass $pass/10)...")
             data = withContext(Dispatchers.IO) { base64Decode(data, pass) }
+            Log.d(TAG, "After base64 pass $pass: ${data.size} bytes")
         }
         onStatus("Decoding hex...")
         val hexed = withContext(Dispatchers.IO) { String(data, Charsets.UTF_8) }
         val rotBytes = withContext(Dispatchers.IO) { hexDecode(hexed) }
+        Log.d(TAG, "After hex: ${rotBytes.size} bytes")
         onStatus("Decoding ROT13...")
         xml = withContext(Dispatchers.IO) { rot13Decode(String(rotBytes, Charsets.UTF_8)) }
+        Log.d(TAG, "After ROT13: ${xml.length} chars")
     }
     onStatus("Validating...")
     if (xml.isBlank()) throw EmptyKeyboxException()
     withContext(Dispatchers.IO) { validateKeybox(xml) }
-    val fixedXml = xml
-        .replace("-----</Certificate>", "-----\n</Certificate>")
-        .replace("-----</PrivateKey>", "-----\n</PrivateKey>")
+    Log.d(TAG, "Final XML: ${xml.length} chars")
     onStatus("Done.")
-    return fixedXml
+    return xml
 }
 
 private fun isHexString(s: String): Boolean {
