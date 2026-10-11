@@ -1,0 +1,21 @@
+# Gradle
+.gradle/
+build/
+**/build/
+
+# Local config
+local.properties
+*.keystore
+*.jks
+
+# Android Studio
+.idea/
+*.iml
+.DS_Store
+
+# APK outputs
+app/release/
+app/debug/
+
+# Logs
+*.log
