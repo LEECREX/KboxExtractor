@@ -38,6 +38,6 @@ Built with
 - [Claude](https://claude.ai) by Anthropic
 - [OpenCode](https://github.com/sst/opencode) by SST
 
-- > **Note:** The contributor graph may show an unrelated GitHub account
+> **Note:** The contributor graph may show an unrelated GitHub account
 > due to a git configuration issue during development. That account has
 > no involvement in this project whatsoever.
